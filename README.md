@@ -17,8 +17,12 @@
 ## 📸 Screenshots & Showcase
 
 <p align="center">
-  <img src="Attributes.jpg" alt="FM26 Studio Player Attributes Editor" width="48%" />
-  <img src="Board.jpg" alt="FM26 Studio Club Board & Finances" width="48%" />
+  <img src="Tactical_Advisor.jpg" alt="FM26 Studio AI Tactical Advisor & Role Mastermind" width="49%" />
+  <img src="Squad_Overview.jpg" alt="FM26 Studio Squad Overview & Preset Tools" width="49%" />
+</p>
+<p align="center">
+  <img src="Attributes.jpg" alt="FM26 Studio Player Attributes Editor" width="49%" />
+  <img src="Board.jpg" alt="FM26 Studio Club Board & Finances" width="49%" />
 </p>
 
 ---
