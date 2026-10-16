@@ -14,6 +14,15 @@
 
 ---
 
+## 📸 Screenshots & Showcase
+
+<p align="center">
+  <img src="Attributes.jpg" alt="FM26 Studio Player Attributes Editor" width="48%" />
+  <img src="Board.jpg" alt="FM26 Studio Club Board & Finances" width="48%" />
+</p>
+
+---
+
 ## ⚡ Core Features
 
 ### 1. 🧠 AI Tactical Mastermind & Tactical Advisor
