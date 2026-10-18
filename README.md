@@ -1,5 +1,4 @@
-# FM26 Studio
-
+# FM Studio 26 – Advanced Live Memory Editor for Football Manager 2026
 > **The Next-Generation Real-Time In-Game Memory Editor & AI Tactical Mastermind for Football Manager 2026**
 
 [![Platform](https://img.shields.io/badge/Platform-Windows%20x64-blue.svg)](https://github.com/)
