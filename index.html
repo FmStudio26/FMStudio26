@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FM Studio Lab | Real-Time Live Memory Editor for Football Manager</title>
+
+  <!-- Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-NR044JL9CE"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-NR044JL9CE');
+  </script>
+
+  <style>
+    :root {
+      --bg: #0f0a1c;
+      --card-bg: #1c142e;
+      --card-border: #332552;
+      --accent-purple: #7a1b7e;
+      --accent-orange: #ea580c;
+      --accent-cyan: #00d2ff;
+      --discord-blurple: #5865F2;
+      --github-dark: #24292e;
+      --text: #ffffff;
+      --text-muted: #b3a9c9;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+    body { background: var(--bg); color: var(--text); line-height: 1.6; }
+    .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+    
+    /* Top Navigation / Status Bar */
+    .top-bar { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid var(--card-border); margin-bottom: 30px; font-size: 0.9rem; }
+    .brand-lab { font-weight: 800; letter-spacing: 0.5px; color: #fff; font-size: 1.1rem; text-decoration: none; }
+    .brand-lab span { color: var(--accent-orange); }
+    .status-pill { background: rgba(0, 210, 255, 0.1); border: 1px solid rgba(0, 210, 255, 0.3); color: var(--accent-cyan); padding: 4px 12px; border-radius: 20px; font-weight: 600; display: inline-flex; align-items: center; gap: 6px; }
+    .status-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; display: inline-block; box-shadow: 0 0 8px #22c55e; }
+
+    /* Header & Hero */
+    header { padding: 30px 0 20px; text-align: center; }
+    .hero-logo { max-width: 130px; margin-bottom: 20px; filter: drop-shadow(0 10px 25px rgba(0,0,0,0.8)); }
+    h1 { font-size: 3rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 12px; }
+    h1 span { color: var(--accent-orange); }
+    .hero-p { font-size: 1.25rem; color: var(--text-muted); max-width: 720px; margin: 0 auto 30px; }
+    
+    /* CTA & Trust Badge */
+    .cta-wrap { margin-bottom: 40px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+    .cta-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+    .btn { display: inline-block; background: linear-gradient(135deg, var(--accent-purple), var(--accent-orange)); color: #fff; padding: 15px 36px; border-radius: 8px; font-weight: 700; text-decoration: none; font-size: 1.15rem; box-shadow: 0 8px 24px rgba(122, 27, 126, 0.4); transition: transform 0.2s, box-shadow 0.2s; border: none; cursor: pointer; }
+    .btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(122, 27, 126, 0.6); }
+    .btn-secondary { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text); box-shadow: none; font-size: 1rem; padding: 12px 24px; }
+    .btn-secondary:hover { background: #261c3d; border-color: var(--accent-cyan); }
+    .btn-discord { background: var(--discord-blurple); box-shadow: 0 8px 24px rgba(88, 101, 242, 0.35); }
+    .btn-github { background: var(--github-dark); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); border: 1px solid #444c56; }
+    
+    .free-tag { font-size: 0.95rem; color: var(--accent-cyan); font-weight: 600; }
+    .trust-badge { font-size: 0.95rem; color: var(--text-muted); }
+    .trust-badge a { color: var(--accent-cyan); text-decoration: none; font-weight: 600; }
+    .trust-badge a:hover { text-decoration: underline; }
+
+    /* Video Player & Fallback Wrapper */
+    .video-showcase { margin: 40px 0 60px; text-align: center; }
+    .video-wrapper {
+      max-width: 960px;
+      margin: 20px auto 0;
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.7);
+      background: #110d1f;
+      min-height: 400px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .video-wrapper video { width: 100%; height: auto; display: block; }
+    .media-fallback { padding: 40px; color: var(--text-muted); font-size: 0.95rem; text-align: center; }
+
+    /* Features Grid */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 50px 0; }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 24px; transition: border-color 0.2s; }
+    .card:hover { border-color: var(--accent-cyan); }
+    .card h3 { font-size: 1.2rem; margin-bottom: 10px; color: #fff; }
+    .card p { font-size: 0.95rem; color: var(--text-muted); }
+
+    /* Interactive Showcase Tabs */
+    .showcase { margin: 60px 0; }
+    .section-title { font-size: 2.2rem; text-align: center; margin-bottom: 10px; }
+    .section-subtitle { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 1.1rem; }
+    
+    .tab-nav { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 30px; }
+    .tab-btn { background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-muted); padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    .tab-btn:hover, .tab-btn.active { background: var(--accent-purple); border-color: var(--accent-orange); color: #fff; }
+
+    .tab-content { display: none; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; overflow: hidden; max-width: 900px; margin: 0 auto; }
+    .tab-content.active { display: grid; grid-template-columns: 1.4fr 1fr; align-items: center; }
+    @media (max-width: 768px) { .tab-content.active { grid-template-columns: 1fr; } }
+    .tab-pane-img { background: #150f24; min-height: 280px; display: flex; align-items: center; justify-content: center; border-right: 1px solid var(--card-border); }
+    .tab-pane-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .tab-pane-info { padding: 32px; }
+    .tab-pane-info h4 { font-size: 1.4rem; margin-bottom: 12px; color: #fff; }
+    .tab-pane-info p { color: var(--text-muted); font-size: 1rem; }
+
+    /* Feedback & Bug Report Section */
+    .feedback-section {
+      background: linear-gradient(180deg, var(--card-bg) 0%, rgba(122, 27, 126, 0.08) 100%);
+      border: 1px solid var(--card-border);
+      border-radius: 14px;
+      padding: 40px;
+      margin: 60px 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+    @media (max-width: 768px) { .feedback-section { grid-template-columns: 1fr; } }
+    .feedback-info h3 { font-size: 1.6rem; margin-bottom: 12px; }
+    .feedback-info p { color: var(--text-muted); margin-bottom: 20px; font-size: 0.95rem; }
+    
+    .feedback-form { display: flex; flex-direction: column; gap: 14px; }
+    .form-control { width: 100%; padding: 12px 16px; background: rgba(15, 10, 28, 0.6); border: 1px solid var(--card-border); border-radius: 8px; color: #fff; font-size: 0.95rem; }
+    .form-control:focus { outline: none; border-color: var(--accent-cyan); }
+    textarea.form-control { resize: vertical; min-height: 100px; }
+
+    /* Community Box */
+    .community-box {
+      background: linear-gradient(180deg, var(--card-bg) 0%, rgba(88, 101, 242, 0.08) 100%);
+      border: 1px solid rgba(88, 101, 242, 0.4);
+      border-radius: 14px;
+      padding: 40px 24px;
+      margin: 60px auto 40px;
+      text-align: center;
+      max-width: 820px;
+    }
+    .community-box h3 { font-size: 1.8rem; margin-bottom: 10px; }
+    .community-box p { color: var(--text-muted); font-size: 1.05rem; max-width: 620px; margin: 0 auto 24px; }
+
+    /* Guide & FAQ */
+    .steps { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 32px; margin: 40px 0; }
+    .steps h3 { margin-bottom: 15px; font-size: 1.4rem; }
+    .steps ol { padding-left: 20px; color: var(--text-muted); }
+    .steps li { margin-bottom: 10px; }
+    .steps strong { color: #fff; }
+
+    .faq { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 32px; margin: 40px 0; }
+    .faq h3 { margin-bottom: 15px; font-size: 1.4rem; }
+    .faq-item { margin-bottom: 18px; }
+    .faq-item h4 { font-size: 1.05rem; color: var(--accent-cyan); margin-bottom: 6px; }
+    .faq-item p { font-size: 0.95rem; color: var(--text-muted); }
+
+    /* Changelog Modal Styles */
+    .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+    .modal.open { display: flex; }
+    .modal-content { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; width: 90%; max-width: 600px; padding: 32px; position: relative; max-height: 80vh; overflow-y: auto; }
+    .modal-close { position: absolute; right: 20px; top: 20px; background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+    .modal-content h3 { margin-bottom: 15px; font-size: 1.5rem; }
+    .changelog-list { display: flex; flex-direction: column; gap: 15px; text-align: left; }
+    .changelog-item h5 { color: var(--accent-cyan); font-size: 1.05rem; margin-bottom: 4px; }
+    .changelog-item ul { padding-left: 18px; color: var(--text-muted); font-size: 0.95rem; }
+
+    footer { text-align: center; padding: 40px 0; color: #726887; font-size: 0.9rem; border-top: 1px solid var(--card-border); margin-top: 60px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="top-bar">
+      <a href="#" class="brand-lab">FM STUDIO <span>LAB</span></a>
+      <div style="display: flex; gap: 15px; align-items: center;">
+        <div class="status-pill"><span class="status-dot"></span> FM26 v1.3.2 Active</div>
+        <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.85rem;" onclick="toggleModal(true)">📋 Changelog</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="container">
+    <img src="Logo.png" alt="FM Studio Lab Logo" class="hero-logo" onerror="this.style.display='none'">
+    <h1>FM STUDIO <span>LAB</span></h1>
+    <p class="hero-p">The definitive developer studio and live memory editor for Football Manager. Modify attributes, stadium architecture, youth academies, and board vision in real time.</p>
+    
+    <div class="cta-wrap">
+      <div class="cta-buttons">
+        <a href="FM_Studio_26_Setup_v1.3.2.zip" class="btn" download>Download FM Studio v1.3.2</a>
+        <a href="https://github.com/FmStudio26" target="_blank" rel="noopener noreferrer" class="btn btn-github">🐙 GitHub Hub</a>
+      </div>
+      <div class="free-tag">100% Free Download &bull; Instant Access</div>
+      <div class="trust-badge">
+        🛡️ <strong>Verified Safe:</strong> 0/68 security vendors flagged this file &bull; 
+        <a href="https://www.virustotal.com/gui/file/1a9e01bd6cbdeaf4a6af779766af71d40935c5b8e97cc55694ab87112dff84b6/detection" target="_blank" rel="noopener noreferrer">
+          View VirusTotal Report
+        </a>
+      </div>
+
+      <!-- Live GitHub Download Counter Badge -->
+      <div style="margin-top: 12px; text-align: center;">
+        <a href="https://github.com/FmStudio26/FMStudio26/releases" target="_blank" rel="noopener noreferrer">
+          <img src="https://img.shields.io/github/downloads/FmStudio26/FMStudio26/total?style=for-the-badge&color=7a1b7e&labelColor=1c142e&label=Total%20Downloads" alt="Total Downloads">
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Live Demo Video -->
+    <div class="video-showcase">
+      <h2 class="section-title">See FM Studio in Action</h2>
+      <p class="section-subtitle">Real-time memory editing running live alongside Football Manager</p>
+      
+      <div class="video-wrapper">
+        <video controls autoplay loop muted playsinline poster="Attributes.jpg" preload="metadata" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <source src="FM Studio Demo.mp4" type="video/mp4">
+          Your browser does not support HTML5 video.
+        </video>
+        <div class="media-fallback" style="display:none;">
+          🎥 <strong>Demo Video Preview:</strong> Place your <code>FM Studio Demo.mp4</code> file in the folder to display live gameplay.
+        </div>
+      </div>
+    </div>
+
+    <!-- Features Overview -->
+    <div class="grid">
+      <div class="card">
+        <h3>⚡ Real-Time Stats & Hidden Atts</h3>
+        <p>Edit technical, mental, and physical stats on the fly. View and modify hidden attributes like Consistency, Dirtiness, and Injury Proneness.</p>
+      </div>
+      <div class="card">
+        <h3>🏟️ 3D Stadium Architecture</h3>
+        <p>Take direct control of stadium layout. Modify individual stand seating (North, South, East, West), add roofs, and adjust expansion thresholds.</p>
+      </div>
+      <div class="card">
+        <h3>🛡️ Become Unsackable</h3>
+        <p>Permanently protect your manager profile with Immunity from Sacking, or force instant board approval for all facility and budget requests.</p>
+      </div>
+      <div class="card">
+        <h3>🎓 Youth & Infrastructure</h3>
+        <p>Max out Youth Importance, Facilities, and Junior Coaching to category 1 with a single click, or optimize team tactical familiarity to 100%.</p>
+      </div>
+    </div>
+
+    <!-- Interactive Screenshot Showcase Tabs -->
+    <div class="showcase">
+      <h2 class="section-title">Interactive Feature Showcase</h2>
+      <p class="section-subtitle">Click below to explore different modules of the editor interface</p>
+
+      <div class="tab-nav">
+        <button class="tab-btn active" onclick="switchTab(event, 'tab-attr')">Player Attributes</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-stadium')">3D Stadiums</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-board')">Board Controls</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-position')">Pitch Positions</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-youth')">Youth Academy</button>
+        <button class="tab-btn" onclick="switchTab(event, 'tab-theme')">Search & Themes</button>
+      </div>
+
+      <div id="tab-attr" class="tab-content active">
+        <div class="tab-pane-img">
+          <img src="Attributes.jpg" alt="Player Attributes" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <div class="media-fallback" style="display:none;">🖼️ Attributes Screenshot Preview (Attributes.jpg)</div>
+        </div>
+        <div class="tab-pane-info">
+          <h4>Live Player Attribute Suite</h4>
+          <p>Control technical, mental, physical, and hidden attributes with instant Freeze and Heal tools across your entire roster.</p>
+        </div>
+      </div>
+
+      <div id="tab-stadium" class="tab-content">
+        <div class="tab-pane-img">
+          <img src="Stadium.jpg" alt="Stadium Architecture" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <div class="media-fallback" style="display:none;">🖼️ Stadium Screenshot Preview (Stadium.jpg)</div>
+        </div>
+        <div class="tab-pane-info">
+          <h4>Interactive 3D Stadium Architecture</h4>
+          <p>Visual stand capacity overlays, batch seating modifiers, roof controls, and ground expansion triggers.</p>
+        </div>
+      </div>
+
+      <div id="tab-board" class="tab-content">
+        <div class="tab-pane-img">
+          <img src="Board.jpg" alt="Board Overrides" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <div class="media-fallback" style="display:none;">🖼️ Board Controls Screenshot Preview (Board.jpg)</div>
+        </div>
+        <div class="tab-pane-info">
+          <h4>Board & Vision Overrides</h4>
+          <p>Immunity from dismissal, bypass board upgrade rejections, and lock 100% board confidence instantly.</p>
+        </div>
+      </div>
+
+      <div id="tab-position" class="tab-content">
+        <div class="tab-pane-img">
+          <img src="Position.jpg" alt="Positional Pitch" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <div class="media-fallback" style="display:none;">🖼️ Position Pitch Screenshot Preview (Position.jpg)</div>
+        </div>
+        <div class="tab-pane-info">
+          <h4>Interactive Positional Pitch</h4>
+          <p>Visual role proficiency display from GK to Striker with instant tactical familiarity and role mastery presets.</p>
+        </div>
+      </div>
+
+      <div id="tab-youth" class="tab-content">
+        <div class="tab-pane-img">
+          <img src="youth.jpg" alt="Youth Academy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <div class="media-fallback" style="display:none;">🖼️ Youth Academy Screenshot Preview (youth.jpg)</div>
+        </div>
+        <div class="tab-pane-info">
+          <h4>Youth Academy & Tactics Tools</h4>
+          <p>Instant category upgrades, facility investment approvals, and squad morale/cohesion boosters.</p>
+        </div>
+      </div>
+
+      <div id="tab-theme" class="tab-content">
+        <div class="tab-pane-img">
+          <img src="Light.jpg" alt="Theme Modes" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+          <div class="media-fallback" style="display:none;">🖼️ Theme Modes Screenshot Preview (Light.jpg)</div>
+        </div>
+        <div class="tab-pane-info">
+          <h4>Universal Search & Theme Modes</h4>
+          <p>Lightning-fast indexing across massive save files with zero lag. Includes toggleable Dark and Light UI themes.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bug Report & Feature Request Studio Hub -->
+    <div class="feedback-section">
+      <div class="feedback-info">
+        <h3>🛠️ Studio Support & Requests</h3>
+        <p>Encountered a bug or glitch after a game update, or want to suggest a new feature? Send a direct dispatch to our development log or jump into the Discord server.</p>
+        <p style="font-size: 0.85rem; color: #726887;">All submissions are reviewed directly during development cycles.</p>
+      </div>
+      <form action="https://api.web3forms.com/submit" method="POST" class="feedback-form">
+        <input type="hidden" name="access_key" value="7d4ae0c5-3e99-4e7b-b5ae-d3fce9d37f87">
+        <input type="hidden" name="subject" value="New Bug Report / Request from FM Studio Lab">
+        <input type="text" name="name" class="form-control" placeholder="Your Name or Discord Handle" required>
+        <select name="request_type" class="form-control" required>
+          <option value="" disabled selected>Select Request Type</option>
+          <option value="Bug Report">Bug Report / Game Version Glitch</option>
+          <option value="Feature Request">Feature Request</option>
+          <option value="General Question">General Question</option>
+        </select>
+        <textarea name="message" class="form-control" placeholder="Describe the bug or feature idea in detail..." required></textarea>
+        <button type="submit" class="btn" style="padding: 10px; font-size: 1rem;">Submit Dispatch</button>
+      </form>
+    </div>
+
+    <!-- Community & Development Section -->
+    <div class="community-box">
+      <h3>💬 Join Our Community & Follow Development</h3>
+      <p>Have an idea for a new feature, need help setting up, or want to report a bug? Join the official FM Studio Discord community or follow our development updates on GitHub.</p>
+      <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 15px;">
+        <a href="https://discord.gg/42QKXPZsN" target="_blank" rel="noopener noreferrer" class="btn btn-discord" style="padding: 12px 28px;">
+          💬 Join Discord
+        </a>
+        <a href="https://github.com/FmStudio26" target="_blank" rel="noopener noreferrer" class="btn btn-github" style="padding: 12px 28px;">
+          🐙 View on GitHub
+        </a>
+      </div>
+    </div>
+
+    <!-- Quick Start Guide -->
+    <div class="steps">
+      <h3>Quick Start Guide</h3>
+      <ol>
+        <li>Start <strong>Football Manager</strong> and load your career save.</li>
+        <li>Launch <strong>FM Studio</strong> (Right-click &gt; <em>Run as administrator</em>).</li>
+        <li>Search for any player, club, or stadium to inspect and apply real-time memory adjustments.</li>
+      </ol>
+    </div>
+
+    <!-- Security FAQ -->
+    <div class="faq">
+      <h3>Frequently Asked Questions & Security</h3>
+      <div class="faq-item">
+        <h4>Why does FM Studio require elevated privileges?</h4>
+        <p>FM Studio modifies live game values directly in the running Football Manager process memory. Windows security policies require elevated rights to access another active process's memory space. FM Studio does not communicate over the network or modify system files.</p>
+      </div>
+      <div class="faq-item">
+        <h4>Is the application safe to run?</h4>
+        <p>Yes. The release has been scanned across 68 major security engines on VirusTotal with 0 detections. You can verify the public scan report via the link above.</p>
+      </div>
+    </div>
+  </div>
+
+<!-- 👇 PASTE YOUR GISCUS SCRIPT BLOCK RIGHT HERE 👇 -->
+  <div class="container" style="margin-top: 60px; margin-bottom: 40px;">
+    <h2 class="section-title">Community Discussions</h2>
+    <p class="section-subtitle">Have a question or want to chat with other managers? Drop a thread below.</p>
+    
+    <script src="https://giscus.app/client.js"
+          data-repo="FmStudio26/FMStudio26"
+          data-repo-id="YOUR_REPO_ID_FROM_GISCUS"
+          data-category="General"
+          data-category-id="YOUR_CATEGORY_ID_FROM_GISCUS"
+          data-mapping="pathname"
+          data-strict="0"
+          data-reactions-enabled="1"
+          data-emit-metadata="0"
+          data-input-position="bottom"
+          data-theme="dark"
+          data-lang="en"
+          crossorigin="anonymous"
+          async>
+    </script>
+  </div>
+  
+  <!-- Changelog Modal -->
+  <div id="changelogModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="toggleModal(false)">&times;</button>
+      <h3>📋 Release Changelog</h3>
+      <div class="changelog-list">
+        <div class="changelog-item">
+          <h5>v1.3.0 (Current Release)</h5>
+          <ul>
+            <li>Updated compatibility engine for latest game patch compatibility.</li>
+            <li>Optimized universal search indexing for large custom databases.</li>
+            <li>Added light/dark theme toggle persistence.</li>
+          </ul>
+        </div>
+        <div class="changelog-item">
+          <h5>v1.2.0</h5>
+          <ul>
+            <li>Introduced 3D Stadium Architecture standalone stand modifiers.</li>
+            <li>Added youth academy rating overrides.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>FM Studio Lab supports full save-game database scaling across all loaded leagues. Requires Windows 10 / 11 (64-bit) & .NET Desktop Runtime.</p>
+  </footer>
+
+  <script>
+    function switchTab(evt, tabId) {
+      const contents = document.querySelectorAll('.tab-content');
+      contents.forEach(c => c.classList.remove('active'));
+      
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(b => b.classList.remove('active'));
+      
+      document.getElementById(tabId).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+
+    function toggleModal(show) {
+      const modal = document.getElementById('changelogModal');
+      if (show) {
+        modal.classList.add('open');
+      } else {
+        modal.classList.remove('open');
+      }
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById('changelogModal');
+      if (event.target == modal) {
+        toggleModal(false);
+      }
+    }
+  </script>
+
+</body>
+</html>
